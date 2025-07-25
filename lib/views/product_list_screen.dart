@@ -88,7 +88,7 @@ class ProductListScreen extends StatelessWidget {
                                 controller.selectCategory(null);
                               }
                             },
-                            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                             selectedColor: Theme.of(context).colorScheme.secondary,
                             labelStyle: TextStyle(
                               color: isSelected ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -114,7 +114,7 @@ class ProductListScreen extends StatelessWidget {
                               controller.selectCategory(null);
                             }
                           },
-                          backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                           selectedColor: Theme.of(context).colorScheme.secondary,
                           labelStyle: TextStyle(
                             color: isSelected ? Theme.of(context).colorScheme.onSecondary : Theme.of(context).colorScheme.onSurfaceVariant,

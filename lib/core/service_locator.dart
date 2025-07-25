@@ -1,35 +1,38 @@
 import 'package:get_it/get_it.dart';
-import 'package:get/get.dart';
 import '../services/database_service.dart';
-import '../controllers/employee_controller.dart';
-import '../controllers/export_controller.dart';
 
-final GetIt getIt = GetIt.instance;
+/// Singleton instance of GetIt for service location
+final GetIt serviceLocator = GetIt.instance;
 
+/// A utility class to register and manage services used across the app.
+/// Uses the `get_it` package for dependency injection.
 class ServiceLocator {
+  /// Register all the services used in the application
+  /// This should be called once during app startup
   static Future<void> setupLocator() async {
-    // Register DatabaseService as lazy singleton
-    // It will be created only when first accessed
-    getIt.registerLazySingleton<DatabaseService>(() => DatabaseService());
+    // Register DatabaseService as a lazy singleton
+    // This means the instance will be created only when it's first needed
+    serviceLocator.registerLazySingleton<DatabaseService>(() => DatabaseService());
   }
 
+  /// Initialize the database after user authentication using a password
   static Future<void> initializeDatabase(String password) async {
-    // Initialize database with password after user authentication
-    final databaseService = getIt<DatabaseService>();
+    final databaseService = serviceLocator<DatabaseService>();
     await databaseService.initDatabase(password);
   }
 
+  /// Reset all registered services (useful when logging out or running tests)
   static void reset() {
-    // Reset all services (useful for logout or testing)
-    getIt.reset();
+    serviceLocator.reset();
   }
 
+  /// Check if the database service is registered and initialized
   static bool get isDatabaseInitialized {
-    // Check if database service is registered and initialized
     try {
-      final databaseService = getIt<DatabaseService>();
+      final databaseService = serviceLocator<DatabaseService>();
       return databaseService.isInitialized;
     } catch (e) {
+      // If the service is not found or not initialized
       return false;
     }
   }

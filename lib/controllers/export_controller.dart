@@ -4,13 +4,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../models/export.dart';
-import '../models/export_item.dart'; // Import ExportItem
+// Import ExportItem
 import '../models/product.dart';
 import '../services/database_service.dart';
 import '../core/service_locator.dart';
 
 class ExportController extends GetxController {
-  DatabaseService get _databaseService => getIt<DatabaseService>();
+  DatabaseService get _databaseService => serviceLocator<DatabaseService>();
 
   final RxList<Export> exports = <Export>[].obs;
   final RxBool sortAscending = false.obs; // New state for sorting order
@@ -113,6 +113,7 @@ class ExportController extends GetxController {
           'productName': product.name,
           'priceAtExport': product.price,
           'quantity': productQuantities[product.id] ?? 0,
+          'categoryId': product.category, // Add categoryId here
         };
       }).toList();
       final String itemsJsonString = jsonEncode(exportItemsJson);

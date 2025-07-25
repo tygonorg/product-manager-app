@@ -6,7 +6,7 @@ import '../services/database_service.dart';
 import '../core/service_locator.dart';
 
 class EmployeeController extends GetxController {
-  DatabaseService get _databaseService => getIt<DatabaseService>();
+  DatabaseService get _databaseService => serviceLocator<DatabaseService>();
 
   final RxList<Employee> employees = <Employee>[].obs;
   final RxBool isLoading = false.obs;

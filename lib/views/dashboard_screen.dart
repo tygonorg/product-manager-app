@@ -4,6 +4,8 @@ import './product_list_screen.dart';
 import './category_list_screen.dart';
 import './employee_list_screen.dart';
 import './export_list_screen.dart';
+import './statistics_screen.dart';
+import './settings_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -15,6 +17,12 @@ class DashboardScreen extends StatelessWidget {
         title: const Text('Dashboard'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Get.to(() => SettingsScreen()),
+          ),
+        ],
       ),
       body: GridView.count(
         crossAxisCount: 2,
@@ -45,6 +53,12 @@ class DashboardScreen extends StatelessWidget {
             icon: Icons.local_shipping,
             label: 'Xuất hàng',
             onTap: () => Get.to(() => ExportListScreen()),
+          ),
+          _buildDashboardItem(
+            context,
+            icon: Icons.bar_chart,
+            label: 'Thống kê',
+            onTap: () => Get.to(() => StatisticsScreen()),
           ),
         ],
       ),

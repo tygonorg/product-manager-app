@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'export_item.dart';
@@ -6,6 +7,7 @@ part of 'export_item.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// coverage:ignore-file
 // ignore_for_file: type=lint
 class ExportItem extends _ExportItem
     with RealmEntity, RealmObjectBase, RealmObject {
@@ -92,12 +94,16 @@ class ExportItem extends _ExportItem
     RealmObjectBase.registerFactory(ExportItem._);
     register(_toEJson, _fromEJson);
     return const SchemaObject(
-        ObjectType.realmObject, ExportItem, 'ExportItem', [
-      SchemaProperty('productId', RealmPropertyType.string),
-      SchemaProperty('productName', RealmPropertyType.string),
-      SchemaProperty('priceAtExport', RealmPropertyType.double),
-      SchemaProperty('quantity', RealmPropertyType.int),
-    ]);
+      ObjectType.realmObject,
+      ExportItem,
+      'ExportItem',
+      [
+        SchemaProperty('productId', RealmPropertyType.string),
+        SchemaProperty('productName', RealmPropertyType.string),
+        SchemaProperty('priceAtExport', RealmPropertyType.double),
+        SchemaProperty('quantity', RealmPropertyType.int),
+      ],
+    );
   }();
 
   @override

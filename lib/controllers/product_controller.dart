@@ -7,7 +7,7 @@ import '../services/database_service.dart';
 import '../core/service_locator.dart';
 
 class ProductController extends GetxController {
-  DatabaseService get _databaseService => getIt<DatabaseService>();
+  DatabaseService get _databaseService => serviceLocator<DatabaseService>();
   
   final RxList<Product> products = <Product>[].obs;
   final RxList<Product> filteredProducts = <Product>[].obs;

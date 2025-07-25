@@ -6,7 +6,7 @@ import '../services/database_service.dart';
 import '../core/service_locator.dart';
 
 class CategoryController extends GetxController {
-  DatabaseService get _databaseService => getIt<DatabaseService>();
+  DatabaseService get _databaseService => serviceLocator<DatabaseService>();
   
   final RxList<Category> categories = <Category>[].obs;
   final RxBool isLoading = false.obs;

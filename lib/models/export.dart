@@ -1,6 +1,4 @@
 import 'package:realm/realm.dart';
-import './product.dart';
-import './export_item.dart';
 
 part 'export.realm.dart';
 

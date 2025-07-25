@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'category.dart';
@@ -6,15 +7,11 @@ part of 'category.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// coverage:ignore-file
 // ignore_for_file: type=lint
 class Category extends _Category
     with RealmEntity, RealmObjectBase, RealmObject {
-  Category(
-    String id,
-    String name,
-    DateTime createdAt,
-    DateTime updatedAt,
-  ) {
+  Category(String id, String name, DateTime createdAt, DateTime updatedAt) {
     RealmObjectBase.set(this, 'id', id);
     RealmObjectBase.set(this, 'name', name);
     RealmObjectBase.set(this, 'createdAt', createdAt);

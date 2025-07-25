@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../controllers/employee_controller.dart';
 import '../models/employee.dart';
 
+/// Màn hình thêm hoặc sửa thông tin nhân viên
+/// Nếu `employee` khác null, chế độ sửa sẽ được bật
 class AddEditEmployeeScreen extends StatefulWidget {
   final Employee? employee;
 
@@ -26,6 +28,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
   @override
   void initState() {
     super.initState();
+    // Khởi tạo controller và các trường nhập liệu từ employee nếu có
     _nameController = TextEditingController(text: widget.employee?.name ?? '');
     _positionController = TextEditingController(text: widget.employee?.position ?? '');
     _emailController = TextEditingController(text: widget.employee?.email ?? '');
@@ -35,6 +38,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
 
   @override
   void dispose() {
+    // Giải phóng bộ nhớ các TextEditingController
     _nameController.dispose();
     _positionController.dispose();
     _emailController.dispose();
@@ -42,7 +46,8 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
     super.dispose();
   }
 
-  void _saveEmployee() {
+  // Lưu hoặc cập nhật nhân viên tùy theo chế độ sửa hay thêm mới
+  void _handleSave() {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text.trim();
       final position = _positionController.text.trim();
@@ -71,6 +76,30 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
     }
   }
 
+  Future<void> _pickStartDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _startDate = pickedDate;
+      });
+    }
+  }
+
+  String? _validateNotEmpty(String? value, String message) {
+    return (value == null || value.trim().isEmpty) ? message : null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) return 'Vui lòng nhập email';
+    if (!GetUtils.isEmail(value.trim())) return 'Email không hợp lệ';
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +121,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
                   border: const OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
-                validator: (value) => value!.isEmpty ? 'Vui lòng nhập tên' : null,
+                validator: (value) => _validateNotEmpty(value, 'Vui lòng nhập tên'),
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -102,7 +131,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
                   border: const OutlineInputBorder(),
                   prefixIcon: Icon(Icons.work, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
-                validator: (value) => value!.isEmpty ? 'Vui lòng nhập chức vụ' : null,
+                validator: (value) => _validateNotEmpty(value, 'Vui lòng nhập chức vụ'),
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -113,7 +142,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
                   prefixIcon: Icon(Icons.email, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (value) => value!.isEmpty || !GetUtils.isEmail(value) ? 'Email không hợp lệ' : null,
+                validator: _validateEmail,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -124,7 +153,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
                   prefixIcon: Icon(Icons.phone, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 keyboardType: TextInputType.phone,
-                validator: (value) => value!.isEmpty ? 'Vui lòng nhập số điện thoại' : null,
+                validator: (value) => _validateNotEmpty(value, 'Vui lòng nhập số điện thoại'),
               ),
               const SizedBox(height: 16),
               Row(
@@ -133,19 +162,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
                     child: Text('Ngày bắt đầu: ${DateFormat('dd/MM/yyyy').format(_startDate)}'),
                   ),
                   TextButton(
-                    onPressed: () async {
-                      final pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: _startDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                      );
-                      if (pickedDate != null) {
-                        setState(() {
-                          _startDate = pickedDate;
-                        });
-                      }
-                    },
+                    onPressed: _pickStartDate,
                     child: const Text('Chọn ngày'),
                   ),
                 ],
@@ -154,7 +171,7 @@ class _AddEditEmployeeScreenState extends State<AddEditEmployeeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _saveEmployee,
+                  onPressed: _handleSave,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,

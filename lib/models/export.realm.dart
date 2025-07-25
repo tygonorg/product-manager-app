@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'export.dart';
@@ -6,6 +7,7 @@ part of 'export.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// coverage:ignore-file
 // ignore_for_file: type=lint
 class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
   Export(

@@ -15,6 +15,8 @@ class DatabaseService {
   bool _isInitialized = false;
   
   bool get isInitialized => _isInitialized;
+
+  Realm get realm => _realm!;
   
   // Tạo encryption key từ password
   Uint8List _generateEncryptionKey(String password) {
@@ -240,6 +242,40 @@ class DatabaseService {
         .toList();
   }
   
+  Future<void> deleteAllData() async {
+    _ensureInitialized();
+    try {
+      _realm!.write(() {
+        _realm!.deleteAll<Product>();
+        _realm!.deleteAll<Category>();
+        _realm!.deleteAll<Employee>();
+        _realm!.deleteAll<Export>();
+      });
+      _realm!.close();
+      _realm = null;
+      _isInitialized = false;
+
+      // Delete the Realm file from the file system
+      Directory appDocDir;
+      if (Platform.isIOS) {
+        appDocDir = await getApplicationDocumentsDirectory();
+      } else if (Platform.isAndroid) {
+        appDocDir = await getApplicationSupportDirectory();
+      } else {
+        appDocDir = await getApplicationDocumentsDirectory();
+      }
+      final dbPath = path.join(appDocDir.path, 'product_manager.realm');
+      final dbFile = File(dbPath);
+      if (await dbFile.exists()) {
+        await dbFile.delete();
+        print('Realm database file deleted: $dbPath');
+      }
+    } catch (e) {
+      print('Error deleting all data: $e');
+      rethrow;
+    }
+  }
+
   void dispose() {
     if (_realm != null) {
       _realm!.close();

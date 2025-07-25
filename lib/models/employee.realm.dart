@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'employee.dart';
@@ -6,6 +7,7 @@ part of 'employee.dart';
 // RealmObjectGenerator
 // **************************************************************************
 
+// coverage:ignore-file
 // ignore_for_file: type=lint
 class Employee extends _Employee
     with RealmEntity, RealmObjectBase, RealmObject {

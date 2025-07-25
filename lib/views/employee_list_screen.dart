@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../controllers/employee_controller.dart';
-import '../models/employee.dart';
 import './add_edit_employee_screen.dart';
 
 class EmployeeListScreen extends StatelessWidget {

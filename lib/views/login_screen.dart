@@ -5,6 +5,8 @@ import '../controllers/product_controller.dart';
 import '../controllers/category_controller.dart';
 import '../controllers/employee_controller.dart';
 import '../controllers/export_controller.dart';
+import '../controllers/statistics_controller.dart';
+import '../controllers/settings_controller.dart';
 import './dashboard_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -176,6 +178,14 @@ class LoginScreen extends StatelessWidget {
       
       // Initialize database with password using ServiceLocator
       await ServiceLocator.initializeDatabase(password);
+      
+      // Put GetX controllers
+      Get.put(ProductController());
+      Get.put(CategoryController());
+      Get.put(EmployeeController());
+      Get.put(ExportController());
+      Get.put(StatisticsController());
+      Get.put(SettingsController()); // Add this line
       
       // Load data into controllers now that database is initialized
       final productController = Get.find<ProductController>();

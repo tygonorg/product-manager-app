@@ -6,8 +6,11 @@ import 'package:uuid/uuid.dart';
 import '../models/export.dart';
 // Import ExportItem
 import '../models/product.dart';
+import '../models/customer.dart';
 import '../services/database_service.dart';
 import '../core/service_locator.dart';
+import '../extensions/export_extensions.dart';
+import '../views/add_edit_customer_screen.dart';
 
 class ExportController extends GetxController {
   DatabaseService get _databaseService => serviceLocator<DatabaseService>();
@@ -16,8 +19,7 @@ class ExportController extends GetxController {
   final RxBool sortAscending = false.obs; // New state for sorting order
   final RxList<Product> selectedProductsToExport = <Product>[].obs;
   final RxMap<String, int> productQuantities = <String, int>{}.obs;
-  final RxString customerName = ''.obs;
-  final RxString customerPhone = ''.obs;
+  final Rx<Customer?> selectedCustomer = Rx<Customer?>(null);
   final RxBool isLoading = false.obs;
 
   @override
@@ -84,13 +86,37 @@ class ExportController extends GetxController {
 
   void createExport({
     required String employeeId,
-    required String customerName,
-    required String customerPhone,
+    Customer? customer, // Accept Customer object
+    String? customerId, // Accept customerId as fallback
   }) {
     if (selectedProductsToExport.isEmpty) {
       Get.snackbar('Lỗi', 'Vui lòng chọn sản phẩm để xuất.');
       return;
     }
+
+    // Determine the customer to use
+    Customer? customerToUse = customer ?? selectedCustomer.value;
+    String? customerIdToUse = customerId;
+    
+    // If customer object is provided, use its ID
+    if (customerToUse != null) {
+      customerIdToUse = customerToUse.id;
+    }
+    // If only customerId is provided, validate it exists
+    else if (customerIdToUse != null) {
+      customerToUse = _databaseService.getCustomerById(customerIdToUse);
+      if (customerToUse == null) {
+        _navigateToAddCustomer();
+        return;
+      }
+    }
+    // If no customer is provided at all
+    else {
+      _navigateToAddCustomer();
+      return;
+    }
+    
+    // At this point, customerIdToUse is guaranteed to be non-null due to the logic above
 
     // Check stock before exporting
     for (var product in selectedProductsToExport) {
@@ -121,8 +147,7 @@ class ExportController extends GetxController {
       final newExport = Export(
         uuid.v4(),
         employeeId,
-        customerName,
-        customerPhone,
+        customerIdToUse, // Use the validated customer ID (guaranteed non-null)
         now,
         calculateTotalAmount(),
         itemsJsonString,
@@ -157,7 +182,7 @@ class ExportController extends GetxController {
           title: const Text('Xác nhận xóa'),
           content: Text(
             'Bạn có chắc chắn muốn xóa hóa đơn #${export.id.substring(0, 8)}?\n'
-            'Khách hàng: ${export.customerName}\n'
+            'Khách hàng: ${export.getCustomerName(_databaseService.realm)}\n'
             'Tổng tiền: ${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(export.totalAmount)}\n\n'
             'Lưu ý: Số lượng sản phẩm sẽ được hoàn trả lại kho.',
           ),
@@ -216,7 +241,47 @@ class ExportController extends GetxController {
   void clearExportSelection() {
     selectedProductsToExport.clear();
     productQuantities.clear();
-    customerName.value = '';
-    customerPhone.value = '';
+    selectedCustomer.value = null;
+  }
+
+  // Set the selected customer
+  void setSelectedCustomer(Customer? customer) {
+    selectedCustomer.value = customer;
+  }
+
+  // Navigate to AddCustomer screen when customer validation fails
+  void _navigateToAddCustomer() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Khách hàng không tồn tại'),
+        content: const Text(
+          'Khách hàng được chọn không tồn tại trong hệ thống. '
+          'Bạn có muốn thêm khách hàng mới không?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // Close dialog
+              Get.to(() => const AddEditCustomerScreen())?.then((result) {
+                // If a customer was added, refresh and potentially select it
+                if (result != null && result is Customer) {
+                  selectedCustomer.value = result;
+                  Get.snackbar(
+                    'Thành công',
+                    'Đã thêm khách hàng mới và chọn làm khách hàng cho hóa đơn.',
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                }
+              });
+            },
+            child: const Text('Thêm khách hàng'),
+          ),
+        ],
+      ),
+    );
   }
 }

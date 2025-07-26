@@ -4,7 +4,10 @@ import 'package:intl/intl.dart';
 import '../controllers/export_controller.dart';
 import '../controllers/product_controller.dart';
 import '../controllers/employee_controller.dart';
+import '../controllers/customer_controller.dart';
+import '../models/customer.dart';
 import '../models/product.dart';
+import 'add_edit_customer_screen.dart';
 
 class ExportScreen extends StatefulWidget {
   final Product? productToExport;
@@ -19,10 +22,10 @@ class _ExportScreenState extends State<ExportScreen> {
   final ExportController exportController = Get.find<ExportController>();
   final ProductController productController = Get.find<ProductController>();
   final EmployeeController employeeController = Get.find<EmployeeController>();
+  final CustomerController customerController = Get.find<CustomerController>();
   
   String? selectedEmployeeId;
-  final customerNameController = TextEditingController();
-  final customerPhoneController = TextEditingController();
+  Customer? selectedCustomer;
   
   @override
   void initState() {
@@ -33,6 +36,9 @@ class _ExportScreenState extends State<ExportScreen> {
     }
     // Clear previous export data
     exportController.clearExportSelection();
+    
+    // Sync the selected customer with the controller
+    selectedCustomer = exportController.selectedCustomer.value;
 
     // If a product is passed, add it to the export list
     if (widget.productToExport != null) {
@@ -42,8 +48,6 @@ class _ExportScreenState extends State<ExportScreen> {
   
   @override
   void dispose() {
-    customerNameController.dispose();
-    customerPhoneController.dispose();
     super.dispose();
   }
 
@@ -89,25 +93,62 @@ class _ExportScreenState extends State<ExportScreen> {
                   },
                 )),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: customerNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Tên khách hàng',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person_outline, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                  ),
-                  onChanged: (value) => exportController.customerName.value = value,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: customerPhoneController,
-                  decoration: InputDecoration(
-                    labelText: 'Số điện thoại khách hàng',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  onChanged: (value) => exportController.customerPhone.value = value,
+                // Customer selection
+                Row(
+                  children: [
+                    Expanded(
+                      child: Obx(() {
+                        // Sync selectedCustomer with controller state
+                        final controllerCustomer = exportController.selectedCustomer.value;
+                        if (controllerCustomer != selectedCustomer) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            setState(() {
+                              selectedCustomer = controllerCustomer;
+                            });
+                          });
+                        }
+                        
+                        return DropdownButtonFormField<Customer>(
+                          value: selectedCustomer,
+                          decoration: InputDecoration(
+                            labelText: 'Khách hàng',
+                            border: const OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.person_outline, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          ),
+                          items: customerController.customers.map((customer) {
+                            return DropdownMenuItem<Customer>(
+                              value: customer,
+                              child: Text('${customer.name} - ${customer.phone}'),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedCustomer = value;
+                              // Update the controller's selected customer
+                              exportController.setSelectedCustomer(value);
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Vui lòng chọn khách hàng';
+                            }
+                            return null;
+                          },
+                        );
+                      }),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: _addNewCustomer,
+                      icon: const Icon(Icons.person_add, size: 20),
+                      label: const Text('Thêm KH'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                        foregroundColor: Theme.of(context).colorScheme.onTertiary,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
@@ -234,21 +275,10 @@ class _ExportScreenState extends State<ExportScreen> {
       return;
     }
     
-    if (exportController.customerName.value.isEmpty) {
+    if (selectedCustomer == null) {
       Get.snackbar(
         'Lỗi',
-        'Vui lòng nhập tên khách hàng',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Theme.of(context).colorScheme.errorContainer,
-        colorText: Theme.of(context).colorScheme.onErrorContainer,
-      );
-      return;
-    }
-    
-    if (exportController.customerPhone.value.isEmpty) {
-      Get.snackbar(
-        'Lỗi',
-        'Vui lòng nhập số điện thoại khách hàng',
+        'Vui lòng chọn khách hàng',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
         colorText: Theme.of(context).colorScheme.onErrorContainer,
@@ -275,8 +305,8 @@ class _ExportScreenState extends State<ExportScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Khách hàng: ${exportController.customerName.value}'),
-            Text('SĐT: ${exportController.customerPhone.value}'),
+            Text('Khách hàng: ${selectedCustomer!.name}'),
+            Text('SĐT: ${selectedCustomer!.phone}'),
             Text('Số sản phẩm: ${exportController.selectedProductsToExport.length}'),
             Text(
               'Tổng tiền: ${NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(exportController.calculateTotalAmount())}',
@@ -295,8 +325,7 @@ class _ExportScreenState extends State<ExportScreen> {
               
               exportController.createExport(
                 employeeId: selectedEmployeeId!,
-                customerName: exportController.customerName.value,
-                customerPhone: exportController.customerPhone.value,
+                customer: selectedCustomer, // Pass the Customer object
               );
             },
             style: ElevatedButton.styleFrom(
@@ -308,6 +337,26 @@ class _ExportScreenState extends State<ExportScreen> {
         ],
       ),
     );
+  }
+  
+  void _addNewCustomer() async {
+    final Customer? newCustomer = await Get.to(() => const AddEditCustomerScreen());
+    if (newCustomer != null && mounted) {
+      // Refresh the customer list and update the selected customer
+      setState(() {
+        selectedCustomer = newCustomer;
+        exportController.setSelectedCustomer(newCustomer);
+      });
+      
+      // Show success message
+      Get.snackbar(
+        'Thành công',
+        'Đã thêm khách hàng mới: ${newCustomer.name}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade100,
+        colorText: Colors.green.shade800,
+      );
+    }
   }
   
   void _showProductSelectionDialog(BuildContext context) {

@@ -9,6 +9,7 @@ import '../models/product.dart';
 import '../models/category.dart';
 import '../models/employee.dart';
 import '../models/export.dart';
+import '../models/customer.dart';
 
 class DatabaseService {
   Realm? _realm;
@@ -54,7 +55,7 @@ class DatabaseService {
       print('Database path: $dbPath');
       
       final config = Configuration.local(
-        [Product.schema, Category.schema, Employee.schema, Export.schema], // Thêm Export và ExportItem schema
+        [Product.schema, Category.schema, Employee.schema, Export.schema, Customer.schema], // Thêm Customer schema
         encryptionKey: encryptionKey,
         path: dbPath,
       );
@@ -185,6 +186,56 @@ class DatabaseService {
     }
   }
   
+  // CRUD operations cho Customer
+  void addCustomer(Customer customer) {
+    _ensureInitialized();
+    _realm!.write(() {
+      _realm!.add(customer);
+    });
+  }
+
+  List<Customer> getAllCustomers() {
+    _ensureInitialized();
+    return _realm!.all<Customer>().toList();
+  }
+
+  Customer? getCustomerById(String id) {
+    _ensureInitialized();
+    return _realm!.find<Customer>(id);
+  }
+
+  void updateCustomer(Customer customer) {
+    _ensureInitialized();
+    _realm!.write(() {
+      _realm!.add(customer, update: true);
+    });
+  }
+
+  void deleteCustomer(String id) {
+    _ensureInitialized();
+    final customer = _realm!.find<Customer>(id);
+    if (customer != null) {
+      _realm!.write(() {
+        _realm!.delete(customer);
+      });
+    }
+  }
+  
+  List<Customer> searchCustomers(String query) {
+    _ensureInitialized();
+    final lowerCaseQuery = query.toLowerCase();
+    
+    return _realm!.all<Customer>().where((customer) {
+      final nameMatch = customer.name.toLowerCase().contains(lowerCaseQuery);
+      final emailMatch = customer.email.toLowerCase().contains(lowerCaseQuery);
+      final phoneMatch = customer.phone.toLowerCase().contains(lowerCaseQuery);
+      final companyMatch = customer.company.toLowerCase().contains(lowerCaseQuery);
+      final addressMatch = customer.address.toLowerCase().contains(lowerCaseQuery);
+      
+      return nameMatch || emailMatch || phoneMatch || companyMatch || addressMatch;
+    }).toList();
+  }
+  
   // CRUD operations cho Export
   void addExport(Export export) {
     _ensureInitialized();
@@ -250,6 +301,7 @@ class DatabaseService {
         _realm!.deleteAll<Category>();
         _realm!.deleteAll<Employee>();
         _realm!.deleteAll<Export>();
+        _realm!.deleteAll<Customer>();
       });
       _realm!.close();
       _realm = null;

@@ -52,7 +52,7 @@ class CustomerController extends GetxController {
     }
   }
 
-  void addCustomer({
+  Customer? addCustomer({
     required String name,
     required String email,
     required String phone,
@@ -80,14 +80,16 @@ class CustomerController extends GetxController {
       );
       _databaseService.addCustomer(customer);
       loadCustomers();
-      Get.back();
+      Get.back(result: customer); // Return the created customer
       Get.snackbar('Thành công', 'Đã thêm khách hàng "$name"');
+      return customer;
     } catch (e) {
       Get.snackbar('Lỗi', 'Không thể thêm khách hàng: $e');
+      return null;
     }
   }
 
-  void updateCustomer({
+  Customer? updateCustomer({
     required String id,
     required String name,
     required String email,
@@ -115,10 +117,12 @@ class CustomerController extends GetxController {
       );
       _databaseService.updateCustomer(customer);
       loadCustomers();
-      Get.back();
+      Get.back(result: customer); // Return the updated customer
       Get.snackbar('Thành công', 'Đã cập nhật khách hàng "$name"');
+      return customer;
     } catch (e) {
       Get.snackbar('Lỗi', 'Không thể cập nhật khách hàng: $e');
+      return null;
     }
   }
 

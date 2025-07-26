@@ -17,4 +17,7 @@ class _Customer {
   late String notes; // Ghi chú
   late DateTime createdAt;
   late DateTime updatedAt;
+  
+  // Note: Reverse relationship to exports can be queried programmatically
+  // using: realm.query<Export>('customerId == $0', [customerId])
 }

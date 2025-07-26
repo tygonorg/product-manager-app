@@ -271,8 +271,10 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
 
   void _saveCustomer() {
     if (_formKey.currentState!.validate()) {
+      Customer? savedCustomer;
+      
       if (isEdit) {
-        controller.updateCustomer(
+        savedCustomer = controller.updateCustomer(
           id: widget.customer!.id,
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
@@ -285,7 +287,7 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
           createdAt: widget.customer!.createdAt,
         );
       } else {
-        controller.addCustomer(
+        savedCustomer = controller.addCustomer(
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           phone: _phoneController.text.trim(),
@@ -295,6 +297,12 @@ class _AddEditCustomerScreenState extends State<AddEditCustomerScreen> {
           customerType: _customerType,
           notes: _notesController.text.trim(),
         );
+      }
+      
+      // The controller handles navigation and returns the customer,
+      // but we ensure the result is available for any calling screens
+      if (savedCustomer != null) {
+        // The Get.back(result: customer) in controller will handle this
       }
     }
   }

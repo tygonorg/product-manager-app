@@ -3,15 +3,41 @@ import 'package:get/get.dart';
 import './product_list_screen.dart';
 import './category_list_screen.dart';
 import './employee_list_screen.dart';
+import './customer_list_screen.dart';
 import './export_list_screen.dart';
 import './statistics_screen.dart';
 import './settings_screen.dart';
+import '../controllers/product_controller.dart';
+import '../controllers/category_controller.dart';
+import '../controllers/employee_controller.dart';
+import '../controllers/customer_controller.dart';
+import '../controllers/export_controller.dart';
+import '../controllers/statistics_controller.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
+  
+  @override
+  void onInit() {
+    // Initialize all controllers when dashboard loads
+    Get.put(ProductController());
+    Get.put(CategoryController());
+    Get.put(EmployeeController());
+    Get.put(CustomerController());
+    Get.put(ExportController());
+    Get.put(StatisticsController());
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Initialize controllers
+    Get.put(ProductController());
+    Get.put(CategoryController());
+    Get.put(EmployeeController());
+    Get.put(CustomerController());
+    Get.put(ExportController());
+    Get.put(StatisticsController());
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
@@ -47,6 +73,12 @@ class DashboardScreen extends StatelessWidget {
             icon: Icons.people,
             label: 'Nhân viên',
             onTap: () => Get.to(() => EmployeeListScreen()),
+          ),
+          _buildDashboardItem(
+            context,
+            icon: Icons.groups,
+            label: 'Khách hàng',
+            onTap: () => Get.to(() => CustomerListScreen()),
           ),
           _buildDashboardItem(
             context,

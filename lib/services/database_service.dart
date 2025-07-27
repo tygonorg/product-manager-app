@@ -9,6 +9,8 @@ import '../models/product.dart';
 import '../models/category.dart';
 import '../models/employee.dart';
 import '../models/export.dart';
+import '../models/customer.dart';
+import '../migrations/export_customer_migration.dart';
 
 class DatabaseService {
   Realm? _realm;
@@ -53,15 +55,24 @@ class DatabaseService {
       
       print('Database path: $dbPath');
       
-      final config = Configuration.local(
-        [Product.schema, Category.schema, Employee.schema, Export.schema], // Thêm Export và ExportItem schema
-        encryptionKey: encryptionKey,
+      // Use migration configuration with schema version management
+      final schemas = [
+        Product.schema,
+        Category.schema,
+        Employee.schema,
+        Export.schema,
+        Customer.schema,
+      ];
+      
+      final config = ExportCustomerMigration.getMigrationConfiguration(
+        schemas,
         path: dbPath,
+        encryptionKey: encryptionKey,
       );
       
       _realm = Realm(config);
       _isInitialized = true;
-      print('Database initialized successfully with encryption at: $dbPath');
+      print('Database initialized successfully with encryption and migration support at: $dbPath');
     } catch (e) {
       _isInitialized = false;
       print('Error initializing database: $e');
@@ -185,6 +196,62 @@ class DatabaseService {
     }
   }
   
+  // CRUD operations cho Customer
+  void addCustomer(Customer customer) {
+    _ensureInitialized();
+    _realm!.write(() {
+      _realm!.add(customer);
+    });
+  }
+
+  List<Customer> getAllCustomers() {
+    _ensureInitialized();
+    return _realm!.all<Customer>().toList();
+  }
+
+  Customer? getCustomerById(String id) {
+    _ensureInitialized();
+    return _realm!.find<Customer>(id);
+  }
+
+  void updateCustomer(Customer customer) {
+    _ensureInitialized();
+    _realm!.write(() {
+      _realm!.add(customer, update: true);
+    });
+  }
+
+  void deleteCustomer(String id) {
+    _ensureInitialized();
+    final customer = _realm!.find<Customer>(id);
+    if (customer != null) {
+      _realm!.write(() {
+        _realm!.delete(customer);
+      });
+    }
+  }
+  
+  List<Customer> searchCustomers(String query) {
+    _ensureInitialized();
+    final lowerCaseQuery = query.toLowerCase();
+    
+    return _realm!.all<Customer>().where((customer) {
+      final nameMatch = customer.name.toLowerCase().contains(lowerCaseQuery);
+      final emailMatch = customer.email.toLowerCase().contains(lowerCaseQuery);
+      final phoneMatch = customer.phone.toLowerCase().contains(lowerCaseQuery);
+      final companyMatch = customer.company.toLowerCase().contains(lowerCaseQuery);
+      final addressMatch = customer.address.toLowerCase().contains(lowerCaseQuery);
+      
+      return nameMatch || emailMatch || phoneMatch || companyMatch || addressMatch;
+    }).toList();
+  }
+  
+  // Get live Realm Results stream for customers (for dropdowns)
+  RealmResults<Customer> getCustomersStream() {
+    _ensureInitialized();
+    return _realm!.all<Customer>();
+  }
+  
   // CRUD operations cho Export
   void addExport(Export export) {
     _ensureInitialized();
@@ -192,10 +259,39 @@ class DatabaseService {
       _realm!.add(export);
     });
   }
+  
+  // Add export with customer ID
+  void addExportWithCustomerId(Export export, String customerId) {
+    _ensureInitialized();
+    _realm!.write(() {
+      export.customerId = customerId;
+      _realm!.add(export);
+    });
+  }
+  
+  // Add export with customer object
+  void addExportWithCustomer(Export export, Customer customer) {
+    _ensureInitialized();
+    addExportWithCustomerId(export, customer.id);
+  }
 
   List<Export> getAllExports() {
     _ensureInitialized();
     return _realm!.all<Export>().toList();
+  }
+  
+  // Get exports by customer ID
+  List<Export> getExportsByCustomerId(String customerId) {
+    _ensureInitialized();
+    return _realm!.all<Export>()
+        .where((export) => export.customerId == customerId)
+        .toList();
+  }
+  
+  // Get exports by customer object
+  List<Export> getExportsByCustomer(Customer customer) {
+    _ensureInitialized();
+    return getExportsByCustomerId(customer.id);
   }
 
   Export? getExportById(String id) {
@@ -211,6 +307,29 @@ class DatabaseService {
         _realm!.delete(export);
       });
     }
+  }
+  
+  // Get customer from export
+  Customer? getCustomerFromExport(Export export) {
+    _ensureInitialized();
+    return getCustomerById(export.customerId);
+  }
+  
+  // Update export with new customer ID
+  void updateExportCustomer(String exportId, String customerId) {
+    _ensureInitialized();
+    final export = _realm!.find<Export>(exportId);
+    if (export != null) {
+      _realm!.write(() {
+        export.customerId = customerId;
+      });
+    }
+  }
+  
+  // Update export with customer object
+  void updateExportWithCustomer(String exportId, Customer customer) {
+    _ensureInitialized();
+    updateExportCustomer(exportId, customer.id);
   }
   
   List<Product> searchProducts(String query) {
@@ -250,6 +369,7 @@ class DatabaseService {
         _realm!.deleteAll<Category>();
         _realm!.deleteAll<Employee>();
         _realm!.deleteAll<Export>();
+        _realm!.deleteAll<Customer>();
       });
       _realm!.close();
       _realm = null;

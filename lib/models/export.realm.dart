@@ -13,14 +13,16 @@ class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
   Export(
     String id,
     String employeeId,
-    String customerName,
-    String customerPhone,
+    String customerId,
     DateTime exportDate,
     double totalAmount,
-    String itemsJson,
-  ) {
+    String itemsJson, {
+    String? customerName,
+    String? customerPhone,
+  }) {
     RealmObjectBase.set(this, 'id', id);
     RealmObjectBase.set(this, 'employeeId', employeeId);
+    RealmObjectBase.set(this, 'customerId', customerId);
     RealmObjectBase.set(this, 'customerName', customerName);
     RealmObjectBase.set(this, 'customerPhone', customerPhone);
     RealmObjectBase.set(this, 'exportDate', exportDate);
@@ -43,17 +45,24 @@ class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
       RealmObjectBase.set(this, 'employeeId', value);
 
   @override
-  String get customerName =>
-      RealmObjectBase.get<String>(this, 'customerName') as String;
+  String get customerId =>
+      RealmObjectBase.get<String>(this, 'customerId') as String;
   @override
-  set customerName(String value) =>
+  set customerId(String value) =>
+      RealmObjectBase.set(this, 'customerId', value);
+
+  @override
+  String? get customerName =>
+      RealmObjectBase.get<String>(this, 'customerName') as String?;
+  @override
+  set customerName(String? value) =>
       RealmObjectBase.set(this, 'customerName', value);
 
   @override
-  String get customerPhone =>
-      RealmObjectBase.get<String>(this, 'customerPhone') as String;
+  String? get customerPhone =>
+      RealmObjectBase.get<String>(this, 'customerPhone') as String?;
   @override
-  set customerPhone(String value) =>
+  set customerPhone(String? value) =>
       RealmObjectBase.set(this, 'customerPhone', value);
 
   @override
@@ -91,6 +100,7 @@ class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
     return <String, dynamic>{
       'id': id.toEJson(),
       'employeeId': employeeId.toEJson(),
+      'customerId': customerId.toEJson(),
       'customerName': customerName.toEJson(),
       'customerPhone': customerPhone.toEJson(),
       'exportDate': exportDate.toEJson(),
@@ -106,8 +116,7 @@ class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
       {
         'id': EJsonValue id,
         'employeeId': EJsonValue employeeId,
-        'customerName': EJsonValue customerName,
-        'customerPhone': EJsonValue customerPhone,
+        'customerId': EJsonValue customerId,
         'exportDate': EJsonValue exportDate,
         'totalAmount': EJsonValue totalAmount,
         'itemsJson': EJsonValue itemsJson,
@@ -115,11 +124,12 @@ class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
         Export(
           fromEJson(id),
           fromEJson(employeeId),
-          fromEJson(customerName),
-          fromEJson(customerPhone),
+          fromEJson(customerId),
           fromEJson(exportDate),
           fromEJson(totalAmount),
           fromEJson(itemsJson),
+          customerName: fromEJson(ejson['customerName']),
+          customerPhone: fromEJson(ejson['customerPhone']),
         ),
       _ => raiseInvalidEJson(ejson),
     };
@@ -131,8 +141,9 @@ class Export extends _Export with RealmEntity, RealmObjectBase, RealmObject {
     return const SchemaObject(ObjectType.realmObject, Export, 'Export', [
       SchemaProperty('id', RealmPropertyType.string, primaryKey: true),
       SchemaProperty('employeeId', RealmPropertyType.string),
-      SchemaProperty('customerName', RealmPropertyType.string),
-      SchemaProperty('customerPhone', RealmPropertyType.string),
+      SchemaProperty('customerId', RealmPropertyType.string),
+      SchemaProperty('customerName', RealmPropertyType.string, optional: true),
+      SchemaProperty('customerPhone', RealmPropertyType.string, optional: true),
       SchemaProperty('exportDate', RealmPropertyType.timestamp),
       SchemaProperty('totalAmount', RealmPropertyType.double),
       SchemaProperty('itemsJson', RealmPropertyType.string),

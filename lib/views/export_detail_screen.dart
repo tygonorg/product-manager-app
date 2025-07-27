@@ -5,9 +5,14 @@ import 'package:intl/intl.dart';
 import '../models/export.dart';
 import '../models/export_item_data.dart';
 import '../controllers/employee_controller.dart';
+import '../services/database_service.dart';
+import '../core/service_locator.dart';
+import '../extensions/export_extensions.dart';
+import './customer_detail_screen.dart';
 class ExportDetailScreen extends StatelessWidget {
   final Export export;
   final EmployeeController employeeController = Get.find<EmployeeController>();
+  final DatabaseService _databaseService = serviceLocator<DatabaseService>();
 
   ExportDetailScreen({super.key, required this.export});
 
@@ -42,8 +47,75 @@ class ExportDetailScreen extends StatelessWidget {
           children: [
             _buildInfoRow(context, 'Mã hóa đơn:', export.id),
             _buildInfoRow(context, 'Nhân viên xuất:', _getEmployeeName(export.employeeId)),
-            _buildInfoRow(context, 'Tên khách hàng:', export.customerName),
-            _buildInfoRow(context, 'SĐT khách hàng:', export.customerPhone),
+            // Customer information - prominent display
+            Card(
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  final customer = export.getCustomer(_databaseService.realm);
+                  if (customer != null) {
+                    Get.to(() => CustomerDetailScreen(customer: customer));
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Khách hàng',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  export.getCustomerName(_databaseService.realm),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  export.getCustomerPhone(_databaseService.realm),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 14,
+                            color: Colors.blueGrey,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             _buildInfoRow(context, 'Ngày xuất:', DateFormat('dd/MM/yyyy HH:mm').format(export.exportDate)),
             _buildInfoRow(context, 'Tổng tiền:', NumberFormat.currency(locale: 'vi_VN', symbol: '₫').format(export.totalAmount)),
             

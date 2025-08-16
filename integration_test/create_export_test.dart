@@ -13,38 +13,30 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Create Export Order E2E Test', () {
-    setUpAll(() async {
-      // This setup runs once before all tests in this group.
-      final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-      
-      // Start the app
-      app.main();
-      await binding.pumpAndSettle();
-
-      // Login to initialize services
-      await binding.tester.enterText(find.byType(TextField), '123456');
-      await binding.tester.tap(find.byType(ElevatedButton));
-      await binding.pumpAndSettle(const Duration(seconds: 2));
-
-      // Get database service
-      final dbService = GetIt.I<DatabaseService>();
-
-      // Create seed data
-      final testCustomer = Customer(ObjectId(), 'Test Customer', email: 'test@customer.com');
-      final testProduct = Product(ObjectId(), 'Test Product', price: 150, quantity: 50);
-      
-      await dbService.addCustomer(testCustomer);
-      await dbService.addProduct(testProduct);
-      
-      // Go back to the dashboard to ensure a clean state for the test
-      await binding.tester.tap(find.byIcon(Icons.dashboard));
-      await binding.pumpAndSettle();
-    });
-
     testWidgets('should create a new export order and verify it is in the list',
         (WidgetTester tester) async {
-      // At this point, the app is already running and logged in.
-      // Test data ("Test Customer", "Test Product") already exists.
+      // Start the app
+      app.main();
+      await tester.pumpAndSettle();
+
+      // --- Login to initialize services ---
+      await tester.enterText(find.byType(TextField), '123456');
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      // --- Seed data for the test ---
+      final dbService = GetIt.I<DatabaseService>();
+      final testCustomer =
+          Customer(ObjectId(), 'Test Customer', email: 'test@customer.com');
+      final testProduct =
+          Product(ObjectId(), 'Test Product', price: 150, quantity: 50);
+
+      await dbService.addCustomer(testCustomer);
+      await dbService.addProduct(testProduct);
+
+      // Ensure we start from the dashboard
+      await tester.tap(find.byIcon(Icons.dashboard));
+      await tester.pumpAndSettle();
 
       // --- Navigate to Exports Screen ---
       await tester.tap(find.byIcon(Icons.outbox));

@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import '../controllers/product_controller.dart';
 import '../models/product.dart';
 
@@ -21,6 +24,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
   late TextEditingController _priceController;
   late TextEditingController _quantityController;
   late String? _selectedCategoryId;
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -29,6 +33,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
     _descriptionController = TextEditingController(text: widget.product?.description ?? '');
     _priceController = TextEditingController(text: widget.product?.price.toString() ?? '');
     _quantityController = TextEditingController(text: widget.product?.quantity.toString() ?? '');
+    _imageUrl = widget.product?.imageUrl;
     
     if (widget.product != null) {
       _selectedCategoryId = widget.product!.category;
@@ -67,6 +72,7 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
           price: price,
           quantity: quantity,
           categoryId: _selectedCategoryId!,
+          imageUrl: _imageUrl ?? '',
         );
       } else {
         controller.addProduct(
@@ -75,8 +81,32 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
           price: price,
           quantity: quantity,
           categoryId: _selectedCategoryId!,
+          imageUrl: _imageUrl ?? '',
         );
       }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _imageUrl = picked.path;
+      });
+    }
+  }
+
+  Future<void> _scanBarcode() async {
+    try {
+      final result = await BarcodeScanner.scan();
+      if (result.rawContent.isNotEmpty) {
+        setState(() {
+          _nameController.text = result.rawContent;
+        });
+      }
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể quét mã: $e');
     }
   }
 
@@ -101,12 +131,28 @@ class _AddEditProductScreenState extends State<AddEditProductScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              GestureDetector(
+                onTap: _pickImage,
+                child: _imageUrl != null && _imageUrl!.isNotEmpty
+                    ? Image.file(File(_imageUrl!), height: 150)
+                    : Container(
+                        height: 150,
+                        width: double.infinity,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.camera_alt, size: 50),
+                      ),
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Tên sản phẩm',
                   border: const OutlineInputBorder(),
                   prefixIcon: Icon(Icons.label, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.qr_code_scanner),
+                    onPressed: _scanBarcode,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {

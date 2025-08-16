@@ -5,9 +5,13 @@ import '../models/product.dart';
 import '../models/category.dart';
 import '../services/database_service.dart';
 import '../core/service_locator.dart';
+import '../services/excel_service.dart';
+import '../services/cloud_sync_service.dart';
 
 class ProductController extends GetxController {
   DatabaseService get _databaseService => serviceLocator<DatabaseService>();
+  final ExcelService _excelService = ExcelService();
+  final CloudSyncService _cloudService = CloudSyncService('https://example.com');
   
   final RxList<Product> products = <Product>[].obs;
   final RxList<Product> filteredProducts = <Product>[].obs;
@@ -272,5 +276,36 @@ class ProductController extends GetxController {
     minPrice.value = 0.0;
     maxPrice.value = double.infinity;
     priceFilterEnabled.value = false;
+  }
+
+  Future<void> importFromExcel(String filePath) async {
+    try {
+      final imported = _excelService.importProducts(filePath);
+      for (final p in imported) {
+        _databaseService.addProduct(p);
+      }
+      loadProducts();
+      Get.snackbar('Thành công', 'Đã nhập dữ liệu từ Excel');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể nhập dữ liệu: $e');
+    }
+  }
+
+  Future<void> exportToExcel(String filePath) async {
+    try {
+      _excelService.exportProducts(filePath, _allProducts);
+      Get.snackbar('Thành công', 'Đã xuất dữ liệu ra Excel');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể xuất dữ liệu: $e');
+    }
+  }
+
+  Future<void> syncToCloud() async {
+    try {
+      await _cloudService.syncProducts(_allProducts);
+      Get.snackbar('Thành công', 'Đồng bộ cloud thành công');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Đồng bộ cloud thất bại: $e');
+    }
   }
 }

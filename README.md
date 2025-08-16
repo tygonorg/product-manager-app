@@ -112,13 +112,17 @@ lib/
 - `uuid: ^4.4.0` - Unique IDs
 - `intl: ^0.20.2` - Internationalization
 - `get_storage: ^2.1.1` - Local storage for settings
+- `image_picker: ^1.0.7` - Chọn hình ảnh từ thiết bị
+- `excel: ^2.0.1` - Xử lý tệp Excel
+- `http: ^1.2.0` - Giao tiếp mạng
+- `barcode_scan2: ^4.2.0` - Quét mã vạch
 
-## 🚀 Các tính năng có thể mở rộng
+## 🚀 Tính năng mở rộng
 
-- [ ] Upload hình ảnh sản phẩm
-- [ ] Xuất/nhập dữ liệu Excel
-- [ ] Đồng bộ cloud
-- [ ] Barcode scanner
+- ✅ **Upload hình ảnh sản phẩm**: Cho phép tải lên và quản lý ảnh sản phẩm trực tiếp từ ứng dụng.
+- ✅ **Xuất/nhập dữ liệu Excel**: Hỗ trợ import/export danh sách sản phẩm và khách hàng qua tệp Excel.
+- ✅ **Đồng bộ cloud**: Đồng bộ dữ liệu với dịch vụ đám mây để sao lưu và truy cập đa thiết bị.
+- ✅ **Barcode scanner**: Quét mã vạch để tìm kiếm và thêm sản phẩm nhanh chóng.
 
 ---
 

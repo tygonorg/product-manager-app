@@ -7,16 +7,16 @@ import 'controllers/settings_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Setup GetIt service locator
   await ServiceLocator.setupLocator();
-  
+
   // Initialize GetStorage
   await GetStorage.init();
-  
+
   // Put SettingsController
   final SettingsController settingsController = Get.put(SettingsController());
-  
+
   runApp(MyApp(settingsController: settingsController));
 }
 
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   final SettingsController settingsController;
 
   const MyApp({super.key, required this.settingsController});
-  
+
   @override
   Widget build(BuildContext context) {
     return Obx(
@@ -32,7 +32,9 @@ class MyApp extends StatelessWidget {
         title: 'Quản Lý Sản Phẩm',
         themeMode: settingsController.themeMode.value,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: settingsController.primaryColor.value),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: settingsController.primaryColor.value,
+          ),
           useMaterial3: true,
         ),
         darkTheme: ThemeData(

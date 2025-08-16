@@ -1,22 +1,41 @@
 PODS:
+  - barcode_scan2 (0.0.1):
+    - Flutter
+    - MTBBarcodeScanner
+    - SwiftProtobuf
   - Flutter (1.0.0)
+  - image_picker_ios (0.0.1):
+    - Flutter
   - integration_test (0.0.1):
     - Flutter
+  - MTBBarcodeScanner (5.0.11)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - realm (20.1.1):
     - Flutter
+  - SwiftProtobuf (1.30.0)
 
 DEPENDENCIES:
+  - barcode_scan2 (from `.symlinks/plugins/barcode_scan2/ios`)
   - Flutter (from `Flutter`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - realm (from `.symlinks/plugins/realm/ios`)
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - MTBBarcodeScanner
+    - SwiftProtobuf
+
 EXTERNAL SOURCES:
+  barcode_scan2:
+    :path: ".symlinks/plugins/barcode_scan2/ios"
   Flutter:
     :path: Flutter
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
   path_provider_foundation:
@@ -25,10 +44,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/realm/ios"
 
 SPEC CHECKSUMS:
+  barcode_scan2: f80517f040989095c9b5067be77649bf6114442c
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  realm: 76c40e4972248f9f1b9d5c156a9ea27739fb5804
+  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  realm: 272f2c0777d8a574a5753731f47a59b1eef7b46d
+  SwiftProtobuf: 3697407f0d5b23bedeba9c2eaaf3ec6fdff69349
 
 PODFILE CHECKSUM: 9b2d02a337ee5a788c889ca46224bfdce24e2c0b
 

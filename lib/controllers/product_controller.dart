@@ -300,6 +300,15 @@ class ProductController extends GetxController {
     }
   }
 
+  Future<void> exportInventoryReport(String filePath) async {
+    try {
+      _excelService.exportInventoryReport(filePath, _allProducts);
+      Get.snackbar('Thành công', 'Đã xuất báo cáo ra Excel');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể xuất báo cáo: $e');
+    }
+  }
+
   Future<void> syncToCloud() async {
     try {
       await _cloudService.syncProducts(_allProducts);

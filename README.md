@@ -121,6 +121,7 @@ lib/
 
 - ✅ **Upload hình ảnh sản phẩm**: Cho phép tải lên và quản lý ảnh sản phẩm trực tiếp từ ứng dụng.
 - ✅ **Xuất/nhập dữ liệu Excel**: Hỗ trợ import/export danh sách sản phẩm và khách hàng qua tệp Excel.
+- ✅ **Báo cáo tồn kho Excel**: Xuất báo cáo tổng hợp số lượng và giá trị sản phẩm theo danh mục.
 - ✅ **Đồng bộ cloud**: Đồng bộ dữ liệu với dịch vụ đám mây để sao lưu và truy cập đa thiết bị.
 - ✅ **Barcode scanner**: Quét mã vạch để tìm kiếm và thêm sản phẩm nhanh chóng.
 

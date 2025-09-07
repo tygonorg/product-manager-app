@@ -2,6 +2,11 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import '../models/product.dart';
 
+class _CategorySummary {
+  int quantity = 0;
+  double value = 0;
+}
+
 class ExcelService {
   List<Product> importProducts(String filePath) {
     final bytes = File(filePath).readAsBytesSync();
@@ -31,6 +36,26 @@ class ExcelService {
     for (final p in products) {
       sheet.appendRow([p.id, p.name, p.description, p.price, p.quantity, p.category, p.imageUrl]);
     }
+    final bytes = excel.encode();
+    File(filePath).writeAsBytesSync(bytes!);
+  }
+
+  void exportInventoryReport(String filePath, List<Product> products) {
+    final excel = Excel.createExcel();
+    final sheet = excel['InventoryReport'];
+    sheet.appendRow(['Category', 'Total Quantity', 'Total Value']);
+
+    final Map<String, _CategorySummary> summary = {};
+    for (final p in products) {
+      final s = summary.putIfAbsent(p.category, () => _CategorySummary());
+      s.quantity += p.quantity;
+      s.value += p.price * p.quantity;
+    }
+
+    summary.forEach((category, s) {
+      sheet.appendRow([category, s.quantity, s.value]);
+    });
+
     final bytes = excel.encode();
     File(filePath).writeAsBytesSync(bytes!);
   }

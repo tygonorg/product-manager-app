@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
@@ -7,6 +8,7 @@ import '../services/database_service.dart';
 import '../core/service_locator.dart';
 import '../services/excel_service.dart';
 import '../services/cloud_sync_service.dart';
+import '../services/google_drive_service.dart';
 
 class ProductController extends GetxController {
   DatabaseService get _databaseService => serviceLocator<DatabaseService>();
@@ -297,6 +299,27 @@ class ProductController extends GetxController {
       Get.snackbar('Thành công', 'Đã xuất dữ liệu ra Excel');
     } catch (e) {
       Get.snackbar('Lỗi', 'Không thể xuất dữ liệu: $e');
+    }
+  }
+
+  Future<void> exportInventoryReport(String filePath) async {
+    try {
+      _excelService.exportInventoryReport(filePath, _allProducts);
+      Get.snackbar('Thành công', 'Đã xuất báo cáo ra Excel');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể xuất báo cáo: $e');
+    }
+  }
+
+  Future<void> exportReportToGoogleDrive(
+      String filePath, String accessToken) async {
+    try {
+      _excelService.exportInventoryReport(filePath, _allProducts);
+      final drive = GoogleDriveService(accessToken);
+      await drive.uploadFile(File(filePath));
+      Get.snackbar('Thành công', 'Đã tải báo cáo lên Google Drive');
+    } catch (e) {
+      Get.snackbar('Lỗi', 'Không thể tải lên Google Drive: $e');
     }
   }
 

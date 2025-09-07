@@ -123,6 +123,7 @@ lib/
 - ✅ **Xuất/nhập dữ liệu Excel**: Hỗ trợ import/export danh sách sản phẩm và khách hàng qua tệp Excel.
 - ✅ **Báo cáo tồn kho Excel**: Xuất báo cáo tổng hợp số lượng và giá trị sản phẩm theo danh mục.
 - ✅ **Đồng bộ cloud**: Đồng bộ dữ liệu với dịch vụ đám mây để sao lưu và truy cập đa thiết bị.
+- ✅ **Tải báo cáo lên Google Drive**: Xuất và tải báo cáo Excel trực tiếp lên Google Drive.
 - ✅ **Barcode scanner**: Quét mã vạch để tìm kiếm và thêm sản phẩm nhanh chóng.
 
 ---
